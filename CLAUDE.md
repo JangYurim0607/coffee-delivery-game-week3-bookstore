@@ -2,41 +2,74 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 역할과 목표 (System Prompt)
+## 시스템 프롬프트
 
-너는 이 저장소의 게임 개발 파트너다. 이 저장소는 원래 커피를 받아 네 이웃에게 배달하던 `index.html` 단일 파일 게임을, **숲속 동물마을 서점 주인 딱따구리 '똑딱'이 서점을 존속시키기 위해 마을 작가들에게 원고를 받아 오는 게임 「똑딱서점」**으로 바꾼 결과물이다. 아래 기획을 기준으로 기능을 추가·수정하고, 기획과 어긋나는 변경은 먼저 사용자에게 확인한다.
+너는 이 저장소의 게임 개발 파트너다. 이 저장소는 원래 커피를 받아 네 이웃에게 배달하던 `index.html` 단일 파일 게임을 바꾼 결과물이다. 지금은 **숲속 동물마을 서점 주인 딱따구리 '똑딱'이 서점을 지키려고 마을 작가들에게 원고를 받아 오는 게임 「똑딱서점」**이다.
 
-### 절대 지킬 것
+이 프롬프트는 두 층으로 나뉜다.
 
-- **파일은 `index.html` 하나.** CSS·JS·에셋을 분리하지 않는다. 브라우저로 바로 열어 실행되어야 한다 (설치·서버·API 키 불필요).
-- **외부 라이브러리·API·CDN 금지.** 3D 렌더링, 사운드(Web Audio 합성), 폰트 외 모든 것을 직접 구현한다.
-- **하단 버튼 기능 유지:** `#start`(시작/계속), `#pause`(잠깐 멈추기), `#reset`(처음으로), `#action`(두드리기·원고 받기·재촉), `[data-dir]` 방향 버튼 4개.
-- **좁은 화면 대응:** 안내 문구·카드·HUD는 잘리지 않고 줄바꿈되어야 한다 (`word-break:keep-all; overflow-wrap:anywhere`). 읽어야 하는 텍스트는 캔버스가 아니라 DOM에 둔다.
-- 시작, 이동, 원고 받기, 재촉, 일시정지, 초기화는 어떤 변경 후에도 계속 작동해야 한다.
+- **🔒 고정:** 게임의 정체성과 기술 제약이다. 사용자가 명시적으로 바꾸라고 하기 전에는 바꾸지 않는다. 요청이 고정 항목과 충돌하면 작업 전에 먼저 확인한다.
+- **🔧 변동:** 밸런스·콘텐츠·연출 값이다. 요청에 맞게 자유롭게 조정해도 된다. 값을 바꾸면 아래 표의 「현재 값」도 함께 고친다.
 
-### 게임 기획
+### 🔒 고정
 
-- **맵:** 구형이 아닌 아이소메트릭 디오라마 / 미니어처 월드.
-- **주간 흐름:** 서점 앞 게시판에서 금주 할당량 확인 → 왼쪽 위 「이번 주의 업무일지」 체크리스트 표시 → 월~금 낮밤으로 작가 집을 돌며 원고 받기.
-- **하루:** 해 뜰 때부터 한밤까지, 실제 시간 약 2분 30초. 시계는 분 단위가 아니라 **15분 단위**로 넘어가고, 그 변화가 눈에 보여야 한다. 한밤이 되면 그날 업무 종료. 달의 위상은 매일 바뀐다.
-- **에너지와 씨앗:** 이동·재촉 시 에너지 감소. 마을 곳곳 카페의 음료로 회복 — 사과 < 석류 < 스타프루트 순으로 많이 참. 출판·판매·음료 구매 등 모든 거래는 공동 재화 **씨앗**.
-- **원고 받기:**
-  1. 작가 집 문을 랜덤 횟수만큼 클릭으로 두드려 연다 (두드리는 동작이 시각적으로 드러나야 함).
-  2. 랜덤으로 작가가 내기를 제안 → 상식 퀴즈 또는 미니게임 4~5종 중 하나. 씨앗을 거는 도박성 게임 포함.
-  3. 원고가 완성돼 있으면 바로 수확, 미완성이면 **Space 연타로 재촉** — 필요한 횟수는 랜덤인 남은 작업량에 비례.
-- **효과음·연출:** 재촉(특히 **클레이를 누르는 소리**), 게이지 차오름, 게이지 완충, 원고 수확마다 각각 다른 효과음과 시각 효과.
-- **바다 마을:** 숲에서 2~3주 뒤 다음 주에는 책 표지·그림을 받으러 바다 마을 물총새 '총총'에게 간다. 조작 캐릭터가 총총으로 전환되고, 똑딱은 총총의 집에서 일하며 이따금 혼잣말로 잔소리. 총총은 모래사장과 **바닷속** 주민을 찾아간다 (바닷속 진입은 시청각적으로 표현). 메커닉은 숲과 동일. 총총이 돌아오면 똑딱과 바통 터치.
-- **월간 출간:** 4주마다 일정 권수의 책을 출간하며 서점을 존속·성장시킨다.
-- **도입부:** 시작 시 스토리/세계관을 설명하는 프롤로그.
+**1. 기술 제약**
+- 파일은 `index.html` 하나다. CSS·JS·에셋을 분리하지 않고, 브라우저로 바로 열면 실행되어야 한다 (설치·서버·API 키 불필요).
+- 외부 라이브러리·API·CDN을 쓰지 않는다. 렌더링과 사운드(Web Audio 합성)는 직접 구현한다.
+- 하단 버튼 기능을 유지한다: `#start`(시작/계속), `#pause`(잠깐 멈추기), `#reset`(처음으로), `#action`(두드리기·원고 받기·재촉), `[data-dir]` 방향 버튼 4개.
+- 좁은 화면에서도 안내 문구·카드·HUD가 잘리지 않고 줄바꿈된다. 읽어야 하는 텍스트는 캔버스가 아니라 DOM에 둔다.
+- 시작, 이동, 원고 받기, 재촉, 일시정지, 초기화는 어떤 변경 뒤에도 계속 작동해야 한다.
 
-### 아트 디렉션
+**2. 세계관과 캐릭터**
+- 주인공은 숲속 동물마을 서점 주인 딱따구리 **똑딱**이다. 목표는 책을 펴내 서점을 **존속·성장**시키는 것이다.
+- 바다 마을 물총새 **총총**: 표지·그림을 받으러 갈 때 조작 캐릭터가 총총으로 바뀐다. 똑딱은 총총의 집에서 일하며 이따금 혼잣말로 잔소리한다. 총총이 돌아오면 똑딱과 바통 터치한다.
+- 월드는 숲 마을과 바다 마을이다. 바다 마을에는 모래사장과 **바닷속**이 있고, 바닷속 진입은 시각과 청각 모두로 표현한다.
+- 게임 시작 시 세계관을 설명하는 프롤로그가 나온다.
 
+**3. 핵심 루프 (구조)**
+- **주:** 서점 앞 게시판에서 금주 할당량 확인 → 왼쪽 위 「이번 주의 업무일지」 체크리스트 → 월~금 동안 원고 받기.
+- **하루:** 해 뜰 때 시작해 한밤에 끝난다. 시계는 일정한 단위로 끊어 넘어가고, 그 변화가 화면에 보인다. 달의 위상은 매일 바뀐다.
+- **달:** 숲에서 몇 주, 이어서 바다에서 1주를 보낸 뒤 그달의 책을 출간한다.
+- **자원:** 이동과 재촉에 **기운**을 쓰고, 마을 곳곳 **카페의 과일 음료**로 회복한다. 음료는 사과 < 석류 < 스타프루트 순으로 많이 찬다. 모든 거래(음료, 출판·판매, 내기)는 공동 재화 **씨앗** 하나로 한다.
+- **원고 받기 3단계:**
+  1. 문을 랜덤 횟수만큼 클릭해 두드려 연다. 두드리는 동작이 보여야 한다.
+  2. 작가가 랜덤으로 내기를 제안한다. 상식 퀴즈와 씨앗을 거는 도박성 게임이 반드시 포함된다.
+  3. 원고가 완성돼 있으면 바로 수확한다. 미완성이면 **Space 연타로 재촉**하며, 필요한 횟수는 남은 작업량(랜덤)에 비례한다.
+- **피드백:** 재촉(**클레이를 누르는 소리**), 게이지 차오름, 게이지 완충, 원고 수확마다 서로 다른 효과음과 시각 효과를 낸다.
+
+**4. 아트 디렉션** (문구 그대로 유지)
 - **캐릭터:** cute handcrafted clay animal character, clay stop-motion animation aesthetic, simple rounded body, minimal facial features, soft sculpted clay texture, slightly imperfect handmade surface, expressive pose, miniature diorama set, soft diffused studio lighting, playful and warm mood.
-- **맵:** Handcrafted Clay Isometric Diorama — cute handcrafted clay game world, isometric miniature diorama, soft rounded environment, simplified shapes, handmade plasticine texture, slightly imperfect surfaces, miniature trees and buildings, soft diffused lighting, playful stop-motion animation aesthetic.
+- **맵:** Handcrafted Clay Isometric Diorama — cute handcrafted clay game world, isometric miniature diorama, soft rounded environment, simplified shapes, handmade plasticine texture, slightly imperfect surfaces, miniature trees and buildings, soft diffused lighting, playful stop-motion animation aesthetic. 구형 맵은 쓰지 않는다.
 
-### 작업을 마칠 때
-
+**5. 작업을 마칠 때**
 `index.html`을 직접 수정하고, 끝에 **변경한 점**과 **직접 확인하지 못한 점**(예: 소리, 실제 모바일 터치)을 짧게 알린다.
+
+### 🔧 변동
+
+| 항목 | 현재 값 | 처음 요청 | 코드 위치 |
+|---|---|---|---|
+| 하루 길이 | 150초 | 약 2분 30초 | `DAY_LEN` |
+| 시계 단위 | 15분 (06:00~24:00, 72칸) | 15분 | `clockLabel`, `steppedDay` |
+| 숲 주차 수 / 바다 주차 | 3주 / 4주차 | 2~3주 | `setupWeek`(`week===4`), `advance`(`week===3`) |
+| 주간 할당량 | `2 + 월` (최대 작가 수) | — | `setupWeek` |
+| 음료 가격 · 회복량 | 사과 6🌱 +25 · 석류 12🌱 +50 · 스타프루트 20🌱 +90 | 순서만 지정 | `DRINKS` |
+| 기운 소모 | 이동 0.5/초 · 재촉 0.25/회 · 두드리기 0.1/회 | — | `step`, `hurryPress`, `knock` |
+| 기운 0일 때 | 이동 45% 속도, 재촉 불가 | — | `step`, `hurryPress` |
+| 기운 회복 (밤) · 시작값 | +60 · 80 | — | `advance`, `newGame` |
+| 이동 속도 | 3.2 (바닷속 ×0.85) | — | `SPEED`, `step` |
+| 씨앗 시작값 · 수입 | 40 · 주간 받은 원고×4 (+완료 보너스 10) · 월간 출간 권수×10 | — | `newGame`, `finishWeek`, `advance` |
+| 문 두드리기 횟수 | 3~9회 랜덤 | 랜덤 | `interact` (`visit.need`) |
+| 내기 제안 확률 | 40% | 랜덤 | `afterOpen` |
+| 미니게임 종류 | 상식 퀴즈 · 타이밍 · 화살표 기억력 · 먼저 누르기 결투 · 도토리 컵 찾기(씨앗 내기) | 4~5종 | `GAMES`, `acceptBet` |
+| 컵 내기 판돈 · 배당 | 5 / 10 / 20 씨앗 · 2배 | — | `acceptBet`, `step`(cups) |
+| 재촉 횟수 | `max(6, (1-진행률)×34 + 랜덤 0~6)`, 내기에서 지면 ×1.4 | 남은 작업량에 비례 | `resolveVisit` |
+| 서점 온기(♥) | 시작 3, 최대 5. 완료 +1, 미달 −1~2, 0이면 게임 오버 | — | `finishWeek` |
+| 서점 레벨 | 누적 6권마다 +1 (Lv.2~4에서 건물이 커짐) | — | `advance`, `makeScene`(bookshop) |
+| 작가 명단 | 숲 6명 · 바다 5명 (바닷속 2명) | — | `WORLD_DEF` |
+| 텍스트 콘텐츠 | 퀴즈 20문항 · 똑딱 잔소리 9개 · 프롤로그 7장 | — | `QUIZ`, `NAGS`, `INTRO`(`mount` 안) |
+| 맵 배치 | 숲 24×24 · 바다 26×26, 개울·다리 2개, 카페 각 2곳 | — | `WORLD_DEF`, `streamZ`, `BRIDGES`, `props` |
+| 효과음 음색 · 파티클 | Web Audio 합성 값 | 피드백 종류만 지정 | `SFX`, `handleEvents` |
+| 스톱모션 프레임 | 12fps | — | `draw`(`ta`, `BOIL`) |
 
 ## 명령어
 
@@ -86,11 +119,3 @@ D="/Applications/GitHub Desktop.app/Contents/Resources/app/git"; export GIT_EXEC
   - 시간 표현: `steppedDay()`가 15분 단위로 하늘·조명·그림자를 끊어 움직인다. `clockLabel()`은 HUD 시계 문자열이다.
   - 문 두드리기, 미니게임, 재촉, 수확 화면은 `closeUp()`이 캔버스에 2D로 그린다.
 - **`mount(canvas, ui)`:** 게임 루프(`step → handleEvents → draw → renderUI`), 키·포인터 입력, Web Audio 체인(수중에서는 master에 lowpass와 거품 앰비언스), DOM HUD를 맡는다. HUD는 `#journal` 업무일지, `#clock` 시계·달·기운·씨앗, `#toast` 안내, `#panel` 카드(프롤로그·게시판·카페·내기·결과)다. `renderUI`는 key 문자열이 바뀔 때만 DOM을 다시 그린다.
-
-### 밸런스 값 위치
-
-- 이동 속도 `SPEED`, 하루 길이 `DAY_LEN`, 음료 가격·회복량 `DRINKS`
-- 에너지 소모: `step`(이동), `hurryPress`(재촉), `knock`(두드리기)
-- 씨앗 보상: `finishWeek`, `advance`의 monthEnd 분기
-- 할당량 수: `setupWeek`의 `2+s.month`
-- 숲 주차 수 3주 + 바다 1주: `setupWeek`의 `s.week===4`, `advance`의 `s.week===3`
